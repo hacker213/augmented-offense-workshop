@@ -46,7 +46,7 @@ of a subdermal implant.
 ## Files
 
 - **[LAB.md](LAB.md)** — quick step-by-step for all four modules
-- **[instructor-guides/](instructor-guides/)** — the full beginner walkthrough, one per module (1–4)
+- **[student-guides/](student-guides/)** — the full beginner walkthrough, one per module (1–4) — Markdown, Word (.docx), and PDF
 - **[SAFETY.md](SAFETY.md)** — rules of engagement
 - **[TOOLS.md](TOOLS.md)** — the open-source tools used, with links
 - **[module1/](module1/)** — Module 1 demonstrator page + optional local beacon (read before you run)
