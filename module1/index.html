@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  MODULE 1  ·  TIER 0  ·  "The tap that fires"  ·  STATIC DEMONSTRATOR
+  ============================================================================
+
+  READ THIS BEFORE YOU RUN IT. It's a hacker con — you should never run code
+  you haven't read. So here is exactly what this file is:
+
+  WHAT THIS PAGE DOES
+    • It reads a handful of properties your browser hands to EVERY website you
+      visit (user-agent, platform, language, screen size, timezone, referrer).
+    • It shows them back to you, so you can SEE what a hostile page silently
+      learns the instant you tap an NFC tag that points at it.
+    • That's the whole point of Module 1: an NDEF URL that fires on tap means a
+      stranger's page runs in your browser before you decide to trust it.
+
+  WHAT THIS PAGE DOES NOT DO  (open the source and confirm every line)
+    • No network requests. Nothing is sent anywhere. There is no fetch(), no
+      XMLHttpRequest, no <img>/<script> pointing off this page, no beacon.
+    • No storage. No cookies, no localStorage, no sessionStorage.
+    • No fingerprinting libraries, no tracking, no exploitation of anything.
+    • The demo "login" below NEVER reads your password. See the handler.
+
+  This is Tier 0: it runs entirely on YOUR phone. It works opened straight from
+  a file, or hosted on GitHub Pages. There is no server involved at this tier.
+
+  Tier 1 (the optional live "check-in" to YOUR OWN laptop) is a separate,
+  opt-in step. See the commented <script> block near the bottom and README.md.
+  ============================================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 1 — The tap that fires</title>
+  <style>
+    /* Plain, unminified CSS so it's readable. Palette matches the workshop:
+       near-black ink, Adversary-Village crimson, white base. */
+    :root { --ink:#141414; --crim:#C8102E; --mute:#6B7280; --fill:#F4F4F5; --line:#E5E7EB; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+           color: var(--ink); background:#fff; line-height:1.5; }
+    header { background: var(--ink); color:#fff; padding: 22px 18px; }
+    header .tag { color: var(--crim); font-weight:700; letter-spacing:.04em; font-size:12px; }
+    header h1 { margin:.2em 0 0; font-size: 24px; }
+    main { padding: 18px; max-width: 720px; margin: 0 auto; }
+    .banner { border:1px solid var(--line); background: var(--fill); border-radius:12px;
+              padding:14px 16px; margin: 16px 0; font-size: 14px; }
+    .banner b { color: var(--crim); }
+    h2 { font-size: 16px; margin: 22px 0 8px; }
+    .kv { border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+    .kv div { display:flex; justify-content:space-between; gap:12px; padding:10px 14px;
+              border-top:1px solid var(--line); font-size:14px; }
+    .kv div:first-child { border-top:none; }
+    .kv .k { color: var(--mute); }
+    .kv .v { font-weight:600; text-align:right; word-break:break-word; }
+    form { border:1px solid var(--line); border-radius:12px; padding:16px; margin-top:10px; }
+    label { display:block; font-size:13px; color:var(--mute); margin:10px 0 4px; }
+    input { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-size:16px; }
+    button { margin-top:14px; width:100%; padding:12px; border:none; border-radius:8px;
+             background: var(--crim); color:#fff; font-weight:700; font-size:15px; }
+    #loginResult { margin-top:12px; font-size:14px; }
+    footer { color: var(--mute); font-size: 12px; padding: 24px 18px; text-align:center; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="tag">AUGMENTED OFFENSE · MODULE 1 · TIER 0</div>
+    <h1>You tapped a tag. This page is already running.</h1>
+  </header>
+
+  <main>
+    <div class="banner">
+      <b>Nothing here leaves your phone.</b> This page makes no network requests
+      and stores nothing. It only displays what your browser reveals to any site
+      you open. View source to verify — it is short and unminified on purpose.
+    </div>
+
+    <!-- SECTION 1: passively-available data.
+         None of this required you to type anything. A hostile redirect learns
+         all of it the moment the page loads. We just make it visible. -->
+    <h2>What this page can see about you — without asking</h2>
+    <div class="kv" id="passive"><!-- filled in by script below --></div>
+
+    <!-- SECTION 2: the "login" illustration.
+         This form exists ONLY to make a point. Read the submit handler: it does
+         not read the password field at all, and it sends nothing. A malicious
+         look-alike page is what would capture and exfiltrate these. This one
+         does not. -->
+    <h2>A hostile look-alike would ask you to sign in</h2>
+    <form id="demoForm">
+      <label for="u">Email</label>
+      <input id="u" type="email" autocomplete="off" placeholder="you@example.com">
+      <label for="p">Password</label>
+      <input id="p" type="password" autocomplete="off" placeholder="••••••••">
+      <button type="submit">Sign in</button>
+      <div id="loginResult"></div>
+    </form>
+  </main>
+
+  <footer>
+    Module 1 · Tier 0 · runs entirely on your device · no server, no network, no storage
+  </footer>
+
+  <script>
+    // ========================================================================
+    // All logic is below, in plain readable JavaScript. No libraries.
+    // ========================================================================
+
+    // --- SECTION 1: read only browser-exposed, non-sensitive properties. ---
+    // Every one of these is available to any web page by design. We are not
+    // probing, fingerprinting, or exploiting anything — just reading and showing.
+    var facts = [
+      ["Browser / OS (user-agent)", navigator.userAgent],
+      ["Platform",                  navigator.platform || "(not exposed)"],
+      ["Language",                  navigator.language || "(not exposed)"],
+      ["Screen size",               screen.width + " × " + screen.height],
+      ["Timezone",                  Intl.DateTimeFormat().resolvedOptions().timeZone || "(not exposed)"],
+      ["Where you came from",       document.referrer || "(direct / NFC tap — no referrer)"],
+      ["Time on your device",       new Date().toString()]
+    ];
+
+    // Render the key/value rows. We build DOM nodes with textContent (never
+    // innerHTML with untrusted data) so nothing here can inject markup.
+    var box = document.getElementById("passive");
+    facts.forEach(function (pair) {
+      var row = document.createElement("div");
+      var k = document.createElement("span"); k.className = "k"; k.textContent = pair[0];
+      var v = document.createElement("span"); v.className = "v"; v.textContent = pair[1];
+      row.appendChild(k); row.appendChild(v); box.appendChild(row);
+    });
+
+    // --- SECTION 2: the login illustration. ---
+    // IMPORTANT: this handler intentionally does NOT read input #p (password).
+    // It reads nothing sensitive and transmits nothing. Its only job is to
+    // explain what a malicious page would have done at this moment.
+    document.getElementById("demoForm").addEventListener("submit", function (e) {
+      e.preventDefault(); // stop the browser from navigating/submitting anywhere.
+      var out = document.getElementById("loginResult");
+      out.innerHTML =
+        "<b style='color:#C8102E'>Stop.</b> A hostile version of this page would " +
+        "have just captured your email and password and sent them to an attacker. " +
+        "<b>This page did not.</b> There is no code here that reads the password " +
+        "field or makes a network call — confirm it in the source you're reading.";
+    });
+
+    // ========================================================================
+    // TIER 1 (OPTIONAL) — live check-in to YOUR OWN laptop.
+    // ------------------------------------------------------------------------
+    // Leave this commented out for Tier 0. If you want the live "my phone just
+    // checked into my laptop" demo, read beacon.js FIRST, then run
+    // hook_server.py on your laptop and uncomment the next line. The
+    // beacon contacts ONLY the address you serve this page from — your laptop.
+    // ========================================================================
+    // var s = document.createElement('script'); s.src = 'beacon.js'; document.body.appendChild(s);
+  </script>
+</body>
+</html>

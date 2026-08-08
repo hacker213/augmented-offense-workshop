@@ -1,0 +1,25 @@
+# ---- per-attendee / secret (never shared or committed) ----
+tools/my_credential.dic
+tools/default_credential.local   # the real master fob ID lives here
+
+# ---- Python build artifacts ----
+__pycache__/
+*.pyc
+
+# ---- stale bundles / export leftovers (not tracked) ----
+*.zip
+mnt/
+
+# ---- presenter deck (kept out of git per owner) ----
+Augmented-Offense-Deck.pptx
+
+# ---- presenter-only notes (local, never committed) ----
+presenter-notes/
+
+# ---- presenter/optional — not needed by attendees (local only) ----
+tools/
+defense/
+Augmented-Offense-Workshop-Runbook.md
+Augmented-Offense-Pointer.pdf
+proxmark/mod2_classic_clone.cmd
+proxmark/mod3_lf_clone.cmd

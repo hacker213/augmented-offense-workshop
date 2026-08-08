@@ -1,0 +1,26 @@
+# =============================================================================
+# COMMON KNOWN-KEY DICTIONARY · MIFARE Classic Tool (Android) format
+# =============================================================================
+# Well-known / factory-default keys for the native-Android path (NXP chipset).
+# ONE 12-hex key per line; '#' lines are ignored by MCT.
+#
+# HOW TO USE:
+#   1. Copy this file to the phone at:  /MIFARE Classic Tool/key-files/
+#   2. In MCT, select it as your dictionary when reading your card back (Module 2).
+#
+# A fresh magic/gen2 blank uses these common factory keys by default, so a read
+# succeeds without setting any key.
+# =============================================================================
+
+A0A1A2A3A4A5
+D3F7D3F7D3F7
+000000000000
+B0B1B2B3B4B5
+4D3A99C351DD
+1A982C7E459A
+AABBCCDDEEFF
+714C5C886E97
+587EE5F9350F
+A0478CC39091
+533CB6C723F6
+8FD0A4F256E9
